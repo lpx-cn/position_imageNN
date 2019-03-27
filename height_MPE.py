@@ -82,7 +82,7 @@ def MPE(y_pred, y_true):
     # print(K.shape(loss),K.int_shape(loss))
     return K.mean(loss) 
 
-def calculate_height_MPE(path, data):
+def calculate_height_MPE(path, data,iii):
     # calculate the MPE-height of the model in the 'path' using the 'data'
 
     test_features = data[0]
@@ -95,9 +95,9 @@ def calculate_height_MPE(path, data):
 
 
     model = load_model(path, custom_objects = {'MPE':MPE})
-    test_loss = model.evaluate(test_features,test_labels,batch_size = test_labels.shape[0],verbose =0)
-    val_loss = model.evaluate(validation_features,validation_labels,
-                              batch_size = validation_features.shape[0],verbose = 0)
+    # test_loss = model.evaluate(test_features,test_labels,batch_size = test_labels.shape[0],verbose =0)
+    # val_loss = model.evaluate(validation_features,validation_labels,
+                              # batch_size = validation_features.shape[0],verbose = 0)
 
     loss=[]
     prediction = []
@@ -149,16 +149,19 @@ def calculate_height_MPE(path, data):
     # plt.plot(height_MPE[:,0],height_MPE[:,1])
     # plt.plot([1,2,3],[4,5,6])
     plt.show()
+    # plt.savefig('../photo_result/CNN_224_18000_'+str(iii)+'.png')
 
     dataframe = pd.DataFrame({"height":height,"test_loss_mean":meanloss_height})
     dataframe.to_csv(newpath + 'MPE_height.csv')
     
 if __name__ == '__main__':
-    data_path = './dataset_28_28/dataset.hdf5'
+    data_path = './dataset_224_224/dataset.hdf5'
     data = read_data(data_path)
 
-    model_path_list =get_model_files('.') 
+    model_path_list =get_model_files('./debug_CNN/224_18000/') 
     
+    i=0
     for mp in model_path_list:
-        calculate_height_MPE(mp, data)
+        calculate_height_MPE(mp, data,i)
+        i+=1
 
