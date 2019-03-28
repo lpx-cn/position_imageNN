@@ -170,11 +170,11 @@ def calculate_height_MPE(path, data, save_path,
     if mode == 'compare':
         loss = get_epoch_loss(path)[1]
         plt.title(path,loss)
-        plt.savefig('./height_MPE/CNN_28_18000_'+str(loss)+'.png')
+        plt.savefig(save_path+str(loss)+'.png')
     elif mode =='same':
         i = get_epoch_loss(path)[0]
         plt.title(i)
-        plt.savefig('./height_MPE/CNN_28_18000_'+str(i)+'.png')
+        plt.savefig(save_path+str(i)+'.png')
     plt.close()
 
 
@@ -182,11 +182,11 @@ def calculate_height_MPE(path, data, save_path,
     # dataframe.to_csv(newpath + 'MPE_height.csv')
     
 if __name__ == '__main__':
-    data_path = './dataset_28_28/dataset.hdf5'
+    data_path = './dataset/28_18000/'
     data = read_data(data_path)
 
-    model_path_list =get_model_files('./debug_CNN/') 
-    save_path = './height_MPE/'
+    model_path_list =get_model_files('./all_model/CNN_224/') 
+    save_path = './height_MPE/CNN_224/'
     mkdir(save_path)
     
     for mp in model_path_list:
