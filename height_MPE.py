@@ -93,13 +93,14 @@ def MPE(y_pred, y_true):
     # print(K.shape(loss),K.int_shape(loss))
     return K.mean(loss) 
 
-def calculate_height_MPE(path, data, save_path, mode = "compare", epoch_begin = 0):
+def calculate_height_MPE(path, data, save_path,
+        mode = "compare", epoch_begin = 0,epoch_end=100):
     # calculate the MPE-height of the model in the 'path' using the 'data'
     # mode = 'compare', then the results chaotic. Using it when compare which one is better
     #      = 'same', then the results are from one training, it will record the epochs.
 
 
-    if mode == 'same' and get_epoch_loss(path)[0] < epoch_begin:
+    if mode == 'same' and ( get_epoch_loss(path)[0] < epoch_begin or get_epoch_loss(path)[0]>epoch_end):
         print('Skip the step, maybe it\'s already exists!')
         return False
 
@@ -190,5 +191,6 @@ if __name__ == '__main__':
     
     for mp in model_path_list:
         print(mp)
-        calculate_height_MPE(mp, data, save_path, mode = 'same',epoch_begin=0)
+        calculate_height_MPE(mp, data, save_path,
+                mode = 'same',epoch_begin=150,epoch_end=199)
 
