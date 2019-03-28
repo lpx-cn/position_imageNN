@@ -79,7 +79,7 @@ def _conv_bn_relu(**conv_params):
 def keras_debug(root_path, newpath):
     
     # The data, shuffled and split between train and test sets:
-    f = h5py.File('./dataset_224_224/dataset.hdf5','r')
+    f = h5py.File('./dataset_28_28/dataset.hdf5','r')
     X_train = f['x_train'].value
     Y_train = f['y_train'].value
     X_test = f['x_test'].value
@@ -109,16 +109,16 @@ def keras_debug(root_path, newpath):
     # create a CNN network
     input_shape = mean_image.shape
     input = Input(shape = input_shape)
-    bconv0 = Conv2D(filters = 3, kernel_size = (7,7),
-            strides = (4,4),
-            activation = 'relu',
-            padding = 'same')(input)
-    bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
-            padding = 'same')(bconv0)
+    # bconv0 = Conv2D(filters = 3, kernel_size = (7,7),
+            # strides = (4,4),
+            # activation = 'relu',
+            # padding = 'same')(input)
+    # bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
+            # padding = 'same')(bconv0)
     conv1 = Conv2D(filters = 32, kernel_size=(3,3),
             strides = (1,1),
             activation = 'relu',
-            padding = 'same')(bpool0)
+            padding = 'same')(input)
     pool2 = MaxPooling2D(pool_size = (3,3),strides=(2,2),
             padding = 'same')(conv1)
     conv2 = Conv2D(filters = 64, kernel_size = (3,3),
@@ -153,14 +153,14 @@ def keras_debug(root_path, newpath):
 
     ############################### network parameters ###################################
     batch_size = 64 
-    epochs = 2000
+    epochs = 1000
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=1000, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta= 0.1, patience=200)
     csv_logger = CSVLogger(newpath + 'logs.csv')
 
     tensorboard = TensorBoard(log_dir = newpath+'tensorboard',
             write_graph = True)
-    checkpoint = ModelCheckpoint(filepath=newpath+'model_store/best_model.hdf5',
+    checkpoint = ModelCheckpoint(filepath=newpath+'model_store/weights.{epoch:02d}-{val_loss:.2f}.hdf5',
             monitor = 'val_loss',
             save_best_only = True,
             save_weights_only = False,
@@ -216,7 +216,7 @@ def keras_debug(root_path, newpath):
 if __name__ =='__main__':
     time_start = time.time() 
 
-    root_path = "./debug_CNN/224_18000/"
+    root_path = "./debug_CNN/28_10000/"
     mkdir(root_path)
     file_name = []
     for files in os.listdir(root_path):
