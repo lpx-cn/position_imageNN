@@ -70,10 +70,21 @@ def get_model_files(root):
     model_path_list = []
     for fpaths, dirs,fs in os.walk(root):
         for files in fs:
-            if files=='best_model.hdf5':
+            if ('weights' in files) or files=='best_model.hdf5':
                 model_path = os.path.join(fpaths,files)
                 model_path_list.append(model_path)
+    # model_path_list.sort()
     return model_path_list
+
+def get_epoch_loss(path):
+    filename=os.path.basename(path)
+    begin = filename.index('.')
+    end = filename.index('-')
+    epoch = filename[begin+1:end]
+    loss_end = filename.index('.hdf5')
+    loss = filename[end+1:loss_end]
+    return [int(epoch),loss] 
+    
 
 def MPE(y_pred, y_true):
     # define the Mean Positioning Error
@@ -82,16 +93,22 @@ def MPE(y_pred, y_true):
     # print(K.shape(loss),K.int_shape(loss))
     return K.mean(loss) 
 
-def calculate_height_MPE(path, data,iii):
+def calculate_height_MPE(path, data, save_path, mode = "compare", epoch_begin = 0):
     # calculate the MPE-height of the model in the 'path' using the 'data'
+    # mode = 'compare', then the results chaotic. Using it when compare which one is better
+    #      = 'same', then the results are from one training, it will record the epochs.
+
+
+    if mode == 'same' and get_epoch_loss(path)[0] < epoch_begin:
+        print('Skip the step, maybe it\'s already exists!')
+        return False
 
     test_features = data[0]
     test_labels = data[1]
     validation_features = data[2]
     validation_labels = data[3]
 
-    newpath = "./height_MPE/"
-    mkdir(newpath)
+    newpath = save_path 
 
 
     model = load_model(path, custom_objects = {'MPE':MPE})
@@ -146,22 +163,32 @@ def calculate_height_MPE(path, data,iii):
 
     p = plt.figure()
     plt.plot(height_MPE[:,0],height_MPE[:,1],'-o')
-    # plt.plot(height_MPE[:,0],height_MPE[:,1])
-    # plt.plot([1,2,3],[4,5,6])
-    plt.show()
-    # plt.savefig('../photo_result/CNN_224_18000_'+str(iii)+'.png')
+    # plt.show()
+    plt.ylim([0,400])
 
-    dataframe = pd.DataFrame({"height":height,"test_loss_mean":meanloss_height})
-    dataframe.to_csv(newpath + 'MPE_height.csv')
+    if mode == 'compare':
+        loss = get_epoch_loss(path)[1]
+        plt.title(path,loss)
+        plt.savefig('./height_MPE/CNN_28_18000_'+str(loss)+'.png')
+    elif mode =='same':
+        i = get_epoch_loss(path)[0]
+        plt.title(i)
+        plt.savefig('./height_MPE/CNN_28_18000_'+str(i)+'.png')
+    plt.close()
+
+
+    # dataframe = pd.DataFrame({"height":height,"test_loss_mean":meanloss_height})
+    # dataframe.to_csv(newpath + 'MPE_height.csv')
     
 if __name__ == '__main__':
-    data_path = './dataset_224_224/dataset.hdf5'
+    data_path = './dataset_28_28/dataset.hdf5'
     data = read_data(data_path)
 
-    model_path_list =get_model_files('./debug_CNN/224_18000/') 
+    model_path_list =get_model_files('./debug_CNN/') 
+    save_path = './height_MPE/'
+    mkdir(save_path)
     
-    i=0
     for mp in model_path_list:
-        calculate_height_MPE(mp, data,i)
-        i+=1
+        print(mp)
+        calculate_height_MPE(mp, data, save_path, mode = 'same',epoch_begin=0)
 
