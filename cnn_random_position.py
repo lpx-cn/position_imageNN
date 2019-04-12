@@ -117,16 +117,16 @@ def keras_debug(root_path, newpath):
     output_shape = 6
     input_shape = mean_image.shape
     input = Input(shape = input_shape)
-    # bconv0 = Conv2D(filters = 3, kernel_size = (7,7),
-            # strides = (4,4),
-            # activation = 'relu',
-            # padding = 'same')(input)
-    # bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
+    bconv0 = Conv2D(filters = 3, kernel_size = (7,7),
+            strides = (4,4),
+            activation = 'relu',
+            padding = 'same')(input)
+    bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
             # padding = 'same')(bconv0)
     conv1 = Conv2D(filters = 32, kernel_size=(3,3),
             strides = (1,1),
             activation = 'relu',
-            padding = 'same')(input)
+            padding = 'same')(bpool0)
     pool2 = MaxPooling2D(pool_size = (3,3),strides=(2,2),
             padding = 'same')(conv1)
     conv2 = Conv2D(filters = 64, kernel_size = (3,3),
@@ -143,11 +143,12 @@ def keras_debug(root_path, newpath):
     # pool4 = MaxPooling2D(pool_size = (3,3),strides=(3,3))(conv3)
 
     flatten1 = Flatten()(conv4)
-    dense1 = Dense(512, activation = 'relu')(flatten1)
-    dense2 = Dense(256, activation = 'relu')(dense1)
-    dense3 = Dense(128, activation = 'relu')(dense2)
+    dense1 = Dense(1024, activation = 'relu')(flatten1)
+    dense2 = Dense(512, activation = 'relu')(dense1)
+    dense3 = Dense(256, activation = 'relu')(dense2)
+    dense4 = Dense(128, activation = 'relu')(dense3)
     
-    dense = Dense(output_shape)(dense3)
+    dense = Dense(output_shape)(dense4)
 
     # compile and plot the network 
     model = Model(inputs = input, outputs = dense)
