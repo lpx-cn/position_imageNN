@@ -56,7 +56,15 @@ def read_data(path):
     X_test -= mean_image
     X_validation -= mean_image
     X_test /= 128.
-    X_validation /=128.
+    X_validation /=128
+    # output consists of 3D coordinate(3), euler vector(2) and euler angle(1). 
+    # The last three need to be preprocess.
+
+    Y_test[:,3:4]=Y_test[:,3:4]*3000
+    Y_validation[:,3:4] = Y_validation[:,3:4]*3000
+
+    Y_test[:,5] = Y_test[:,5]*3000/np.pi
+    Y_validation[:,5] = Y_validation[:,5]*3000/np.pi
 
     return [X_test, Y_test, X_validation, Y_validation] 
 
@@ -80,57 +88,59 @@ def model_predict(path, data):
     validation_labels = data[3]
 
     model = load_model(path, custom_objects = {'MPE':MPE})
-    test_loss = model.evaluate(test_features,test_labels,batch_size = test_labels.shape[0],verbose =0)
-    val_loss = model.evaluate(validation_features,validation_labels,
-                              batch_size = validation_features.shape[0],verbose = 0)
+    # test_loss = model.evaluate(test_features,test_labels,batch_size = test_labels.shape[0],verbose =0)
+    # val_loss = model.evaluate(validation_features,validation_labels,
+                              # batch_size = validation_features.shape[0],verbose = 0)
     
     # Show the prediction results 
 
-    # loss=[]
-    # loss_square = []
-    # prediction = []
+    loss=[]
+    loss_square = []
+    prediction = []
     
     
-    # data_value = test_features
-    # label_value = test_labels
-    # time_list = []
-    # for i in range(len(data_value)):
-        # time_start = time.time()
-        # x = np.expand_dims(data_value[i], axis=0)
-        # predictation_i = model.predict(x)
-        # prediction.append(predictation_i)
-        # time_end = time.time()
-        # time_list.append(time_end - time_start)
+    data_value = test_features
+    label_value = test_labels[:,0:3]
+    time_list = []
+    for i in range(len(data_value)):
+        time_start = time.time()
+        x = np.expand_dims(data_value[i], axis=0)
+        predictation_i = model.predict(x)
+        prediction.append(predictation_i)
+        time_end = time.time()
+        time_list.append(time_end - time_start)
     
-        # loss_i =  label_value[i] - predictation_i
-        # loss_i = np.linalg.norm(loss_i)
+        print(label_value[i],predictation_i)
+        loss_i =  label_value[i] - predictation_i[0,0:3]
+        loss_i = np.linalg.norm(loss_i)
     
-        # loss_square.append(loss_i**2)
-        # loss.append(loss_i)
+        loss_square.append(loss_i**2)
+        loss.append(loss_i)
     
-        # print("="*50,'\n step: %d'% i)
-        # print("the real value is: ", label_value[i])
-        # print("prediction value is : ", predictation_i)
-        # print("posisitoning error is : %f"%loss_i)
+        print("="*50,'\n step: %d'% i)
+        print("the real value is: ", test_labels[i])
+        print("prediction value is : ", predictation_i)
+        print("posisitoning error is : %f"%loss_i)
         
-    # print(loss)
-    print('test_loss and MPE:',test_loss)
-    print('validation_loss and MPE:',val_loss)
+    print()
+    print('test_loss and MPE:',np.mean(loss))
+    # print('validation_loss and MPE:',val_loss)
     print("="*25,"completed!","="*25)
     
     # print("Mean positioning time cost:", np.mean(time_list))
 
-    return [test_loss[1], val_loss[1]]
+    # return [test_loss[1], val_loss[1]]
+    return min(loss) 
 
 if __name__ == '__main__':
 
 
-    model_path_list = get_model_files('.')
-    data_path = './dataset_28_28/dataset.hdf5'
+    model_path_list = get_model_files('./debug/debug_Resnet/224_random/575.62/')
+    data_path = './dataset/224_random_18000/dataset.hdf5'
     mpe_list = []
     for path in model_path_list:
         data = read_data(data_path)
-        mpe, mpe_val= model_predict(path,data)
+        mpe= model_predict(path,data)
         mpe_list.append(mpe)
     mpe_min = min(mpe_list)
     mpe_min_arg = mpe_list.index(mpe_min)
