@@ -24,7 +24,7 @@ import h5py
 import tensorflow as tf                                                                                       
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.4
+config.gpu_options.per_process_gpu_memory_fraction = 1
 set_session(tf.Session(config=config))
 
 def mkdir(newpath):
@@ -174,26 +174,28 @@ def calculate_height_MPE(path, data, save_path,
     # plt.show()
     plt.ylim([0,250])
 
-    if mode == 'compare':
-        loss = get_epoch_loss(path)[1]
-        plt.title(path,loss)
-        plt.savefig(save_path+str(loss)+'.png')
-    elif mode =='same':
-        i = get_epoch_loss(path)[0]
-        plt.title(i)
-        plt.savefig(save_path+str(i)+'.png')
+    # if mode == 'compare':
+        # loss = get_epoch_loss(path)[1]
+        # plt.title(path,loss)
+        # plt.savefig(save_path+str(loss)+'.png')
+    # elif mode =='same':
+        # i = get_epoch_loss(path)[0]
+        # plt.title(i)
+        # plt.savefig(save_path+str(i)+'.png')
+    # plt.title(path,loss)
+    plt.savefig(save_path+'1'+'.png')
     plt.close()
 
-    # dataframe = pd.DataFrame({"height":height,"test_loss_mean":meanloss_height})
-    # dataframe.to_csv(newpath + 'MPE_height.csv')
+    dataframe = pd.DataFrame({"height":height_MPE[:,0],"height_MPE":height_MPE[:,1]})
+    dataframe.to_csv(save_path+ 'MPE_height.csv')
     return True
     
 if __name__ == '__main__':
-    data_path = './dataset/224_random_18000/dataset.hdf5'
+    data_path = './dataset/224_18000/dataset.hdf5'
     data = read_data(data_path)
 
-    model_path_list =get_model_files('./all_model/Resnet18_224/') 
-    save_path = './height_MPE/Resnet18_224random/'
+    model_path_list =get_model_files('./testmodel/') 
+    save_path = './height_MPE/Resnet18_224/'
     mkdir(save_path)
     
     i=0
