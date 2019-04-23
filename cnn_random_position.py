@@ -31,7 +31,7 @@ from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping,TensorBo
 import tensorflow as tf                                                                                       
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.8
+config.gpu_options.per_process_gpu_memory_fraction = 0.5
 set_session(tf.Session(config=config))
 
 
@@ -117,28 +117,40 @@ def keras_debug(root_path, newpath):
     output_shape = 6
     input_shape = mean_image.shape
     input = Input(shape = input_shape)
-    # bconv0 = Conv2D(filters = 3, kernel_size = (7,7),
-            # strides = (4,4),
-            # activation = 'relu',
-            # padding = 'same')(input)
-    # bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
-            # padding = 'same')(bconv0)
-    conv1 = Conv2D(filters = 32, kernel_size=(3,3),
+    bconv0 = Conv2D(filters = 32, kernel_size = (3,3),
             strides = (1,1),
             activation = 'relu',
             padding = 'same')(input)
+    bpool0 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
+            padding = 'same')(bconv0)
+    bconv1 = Conv2D(filters = 64, kernel_size = (3,3),
+            strides = (1,1),
+            activation = 'relu',
+            padding = 'same')(bpool0)
+    bpool1 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
+            padding = 'same')(bconv1)
+    bconv2 = Conv2D(filters = 128, kernel_size = (3,3),
+            strides = (1,1),
+            activation = 'relu',
+            padding = 'same')(bpool1)
+    bpool2 = MaxPooling2D(pool_size =(3,3), strides=(2,2),
+            padding = 'same')(bconv2)
+    conv1 = Conv2D(filters = 256, kernel_size=(3,3),
+            strides = (1,1),
+            activation = 'relu',
+            padding = 'same')(bpool2)
     pool2 = MaxPooling2D(pool_size = (3,3),strides=(2,2),
             padding = 'same')(conv1)
-    conv2 = Conv2D(filters = 64, kernel_size = (3,3),
+    conv2 = Conv2D(filters = 512, kernel_size = (3,3),
             activation = 'relu',
             padding = 'same')(pool2)
     pool3 = MaxPooling2D(pool_size = (3,3), strides = (2,2),
             padding = 'same')(conv2)
-    conv3 = Conv2D(filters = 128, kernel_size = (3,3),
+    conv3 = Conv2D(filters = 1024, kernel_size = (3,3),
             activation = 'relu',
             padding = 'same')(pool3)
     pool4 = MaxPooling2D(pool_size = (3,3), strides =(2,2))(conv3)
-    conv4 = Conv2D(filters = 256, kernel_size = (3,3),
+    conv4 = Conv2D(filters = 2048, kernel_size = (3,3),
             activation = 'relu')(pool4)
     # pool4 = MaxPooling2D(pool_size = (3,3),strides=(3,3))(conv3)
 
