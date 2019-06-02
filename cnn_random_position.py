@@ -239,6 +239,7 @@ if __name__ =='__main__':
     root_path = "./debug/debug_CNN/224_random/"
     mkdir(root_path)
     file_name = []
+    # Process Setting
     for files in os.listdir(root_path):
         file_name .append(files)
     for i in range (100):
