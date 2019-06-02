@@ -60,6 +60,6 @@ Using CNN and ResNet to locate the camera.
 Folder:	dataset--all training and test data. (28/224, uniform/random, with angle/without angle)
 		debug--all results from different models. (model struction, model weights, MPE, training log)
 		height-MPE--the relationship between cameras's height and mean positioning error.
-	   	testmodel--many model for evaluation
-		log--
-		photo_result--	
+	   	testmodel--many models for evaluation
+		log-- python -u *.py | tee ./log/*.log
+		photo_result--the heigth-MPE photos of all models.
