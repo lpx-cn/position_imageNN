@@ -53,14 +53,12 @@ def MPE(y_pred, y_true):
     return K.mean(loss) 
 
 def _bn_relu(input):
-    """To build a BN --> relu block
-    """
+    # To build a BN --> relu block
     norm = BatchNormalization(axis = CHANNEL_AXIS)(input)
     return Activation("relu")(norm)
 
 def _conv_bn_relu(**conv_params):
-    """To build a conv ->BN -> relu block
-    """
+    # To build a conv ->BN -> relu block
     filters = conv_params["filters"]
     kernel_size = conv_params["kernel_size"]
     strides = conv_params.setdefault("strides", (1, 1))
