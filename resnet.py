@@ -208,40 +208,47 @@ class ResnetBuilder(object):
         block_fn = _get_block(block_fn)
 
         input = Input(shape=input_shape)
-        print("input:", K.int_shape(input))
         pool0 = MaxPooling2D(pool_size=(3,3), strides=(2,2),padding="same")(input)
-        print("pool0:",K.int_shape(pool0))
         
         conv1 = _conv_bn_relu(filters=64, kernel_size=(7, 7), strides=(2, 2))(pool0)
-        print("conv1:", K.int_shape(conv1))
         pool1 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding="same")(conv1)
         
-        print("pool1:",K.int_shape(pool1))
 
         block = pool1
         filters = 64
         for i, r in enumerate(repetitions):
             block = _residual_block(block_fn, filters=filters, repetitions=r, is_first_layer=(i == 0))(block)
-            print(str(i)+":",K.int_shape(block))
             filters *= 2
 
         # Last activation
         block = _bn_relu(block)
 
-        # Classifier block
+        # Position block
         block_shape = K.int_shape(block)
         pool2 = AveragePooling2D(pool_size=(block_shape[ROW_AXIS], block_shape[COL_AXIS]),
                                  strides=(1, 1))(block)
-        print("pool2:", K.int_shape(pool2))
         flatten1 = Flatten()(pool2)
-        print("flatten1:", K.int_shape(flatten1))
         dense1 = Dense(units = 1024, activation = "relu")(flatten1)
-        dense2 = Dense (units = 256, activation = "relu")(dense1)
+        # dense2 = Dense (units = 512, activation = "relu")(dense1)
+        dense3 = Dense (units = 256, activation = "relu")(dense1)
 
-        dense = Dense(units=num_outputs, kernel_initializer="he_normal",
-                      activation="relu")(dense2)
+        P_dense = Dense(units=num_outputs, kernel_initializer="he_normal",
+                      activation="relu")(dense3)
 
-        model = Model(inputs=input, outputs=dense)
+        # Angle block
+        A_conv_1_1 = Conv2D(filters=1024, kernel_size=(1, 1),
+                          padding="same",
+                          kernel_initializer="he_normal",
+                          kernel_regularizer=l2(1e-4))(block)
+        A_flatten1 = Flatten()(A_conv_1_1)
+        A_dense1 = Dense(units = 1024, activation = "relu")(A_flatten1)
+        # A_dense2 = Dense (units = 512, activation = "relu")(A_dense1)
+        A_dense3 = Dense (units = 256, activation = "relu")(A_dense1)
+
+        A_dense = Dense(units=num_outputs, kernel_initializer="he_normal",
+                      activation="relu")(A_dense3)
+
+        model = Model(inputs=input, outputs=[P_dense, A_dense])
         return model
 
     @staticmethod
