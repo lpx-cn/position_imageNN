@@ -14,8 +14,6 @@ import h5py
 def mkdir(path):
  
     isExists=os.path.exists(path)
- 
-    # 判断结果
     if not isExists:
         os.makedirs(path) 
  
@@ -24,6 +22,7 @@ def mkdir(path):
     else:
         print(path+' is existed.') 
         return False
+    
 class room(object):
     def __init__(self, room_size = [6000,6000,5000],
             LED_ordinate = np.mat([(2500,3000,5000),(3500,3000,5000),(3000,3500,5000)]).T,
@@ -161,7 +160,7 @@ class camera(room):
 
 
 def data_generate_uniformity(c1, x,y,z,path):
-    # obtain the data which is a uniform distribution.
+    # Obtain the data which is a uniform distribution.
     x_train = []
     y_train = []
     x_test = []
@@ -235,8 +234,8 @@ def data_generate_uniformity(c1, x,y,z,path):
     return f
 
 def data_generate_random(c1, num, rate, path):
-    # obtain the data in random positiong
-    #   c1: the camera class
+    # obtain the data in random position
+    #   c1: the camera() class
     #   num: the number for all instance
     #   rate: the number of test data / num of all
     #   path: data file's path
