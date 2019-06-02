@@ -86,7 +86,6 @@ def keras_debug(root_path, newpath):
     print(mean_image.shape)
 
     # create a CNN network
-
     model = resnet.ResnetBuilder.build_resnet_101((img_rows, img_cols, img_channels),3)
 
     # compile and plot the network 
@@ -138,6 +137,8 @@ if __name__ =='__main__':
 
     root_path = "./debug_Resnet_101/224_18000/"
     mkdir(root_path)
+
+    # Process setting
     file_name = []
     for files in os.listdir(root_path):
         file_name .append(files)
