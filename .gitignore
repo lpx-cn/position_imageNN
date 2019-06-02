@@ -1,12 +1,13 @@
 # ignore the dataset and old files
 
 old/
-dataset_224_224/
-dataset_28_28/
-dataset_random_224/
 __pycache__/
 *.swp
 *.swo
-debug_CNN/
-debug_Resnet_101/
-debug_Resnet/
+
+
+dataset/
+debug/
+log/
+testmodel/
+
