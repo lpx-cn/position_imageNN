@@ -34,7 +34,7 @@ config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.8
 set_session(tf.Session(config=config))
 
-import resnet
+import resnet_AP
 
 
 def mkdir(path):
@@ -94,11 +94,12 @@ def keras_debug(root_path, newpath):
 
     # create a CNN network
 
-    model = resnet.ResnetBuilder.build_resnet_101((img_rows, img_cols, img_channels),6)
+    model = resnet_AP.ResnetBuilder.build_resnet_101((img_rows, img_cols, img_channels),6)
 
     # compile and plot the network 
     model.compile(loss = 'mse',
             optimizer = 'adam',
+            loss_weight = [1,1],
             metrics = [MPE])
 
     plot_model(model, to_file = newpath+'model_store/model.png', 
