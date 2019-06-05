@@ -57,7 +57,7 @@ def MPE(y_pred, y_true):
 def keras_debug(root_path, newpath):
     
     # The data, shuffled and split between train and test sets:
-    f = h5py.File('./dataset_224_224/dataset.hdf5','r')
+    f = h5py.File('./dataset/28_18000/dataset.hdf5','r')
     X_train = f['x_train'].value
     Y_train = f['y_train'].value
     X_test = f['x_test'].value
@@ -86,7 +86,7 @@ def keras_debug(root_path, newpath):
     print(mean_image.shape)
 
     # create a CNN network
-    model = resnet.ResnetBuilder.build_resnet_101((img_rows, img_cols, img_channels),3)
+    model = resnet.ResnetBuilder.build_resnet_18((img_rows, img_cols, img_channels),3)
 
     # compile and plot the network 
     model.compile(loss = 'mse',
@@ -135,7 +135,7 @@ def keras_debug(root_path, newpath):
 if __name__ =='__main__':
     time_start = time.time() 
 
-    root_path = "./debug_Resnet_101/224_18000/"
+    root_path = "./debug_Resnet_18/28_18000/"
     mkdir(root_path)
 
     # Process setting
