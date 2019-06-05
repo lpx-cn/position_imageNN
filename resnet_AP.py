@@ -232,7 +232,7 @@ class ResnetBuilder(object):
         # dense2 = Dense (units = 512, activation = "relu")(dense1)
         dense3 = Dense (units = 256, activation = "relu")(dense1)
 
-        P_dense = Dense(units=num_outputs, kernel_initializer="he_normal",
+        P_dense = Dense(units=num_outputs[0], kernel_initializer="he_normal",
                       activation="relu")(dense3)
 
         # Angle block
@@ -245,7 +245,7 @@ class ResnetBuilder(object):
         # A_dense2 = Dense (units = 512, activation = "relu")(A_dense1)
         A_dense3 = Dense (units = 256, activation = "relu")(A_dense1)
 
-        A_dense = Dense(units=num_outputs, kernel_initializer="he_normal",
+        A_dense = Dense(units=num_outputs[1], kernel_initializer="he_normal",
                       activation="relu")(A_dense3)
 
         model = Model(inputs=input, outputs=[P_dense, A_dense])

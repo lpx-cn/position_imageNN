@@ -60,7 +60,7 @@ def keras_debug(root_path, newpath):
     f = h5py.File('./dataset/224_random_18000/dataset.hdf5','r')
     X_train = f['x_train'].value
     Y_train = f['y_train'].value
-    X_test = f['x_test'].value
+    X_test= f['x_test'].value
     Y_test = f['y_test'].value
     
     X_train = X_train.astype('float32')
@@ -77,29 +77,34 @@ def keras_debug(root_path, newpath):
     X_test -= mean_image
     X_validation -= mean_image
     X_train /= 128.
-    X_test /= 128.
     X_validation /=128.
 
     # output consists of 3D coordinate(3), euler vector(2) and euler angle(1). 
     # The last three need to be preprocess.
     
-    Y_test[:,3:4]=Y_test[:,3:4]*3000
-    Y_train[:,3:4] = Y_train[:,3:4]*3000
-    Y_validation[:,3:4] = Y_validation[:,3:4]*3000
+    # Y_test[:,3:4]=Y_test[:,3:4]*3000
+    # Y_train[:,3:4] = Y_train[:,3:4]*3000
+    # Y_validation[:,3:4] = Y_validation[:,3:4]*3000
     
-    Y_test[:,5] = Y_test[:,5]*3000/np.pi
-    Y_train[:,5] = Y_train[:,5]*3000/np.pi
-    Y_validation[:,5] = Y_validation[:,5]*3000/np.pi
-    print(Y_test)
+    # Y_test[:,5] = Y_test[:,5]*3000/np.pi
+    # Y_train[:,5] = Y_train[:,5]*3000/np.pi
+    # Y_validation[:,5] = Y_validation[:,5]*3000/np.pi
+
+
+    P_train = Y_train[:,0:3]
+    A_train = Y_train[:,3:6]
+    P_val = Y_validation[:, 0:3]
+    A_val = Y_validation[:, 3:6]
 
     # create a CNN network
 
-    model = resnet_AP.ResnetBuilder.build_resnet_101((img_rows, img_cols, img_channels),6)
+    img_rows, img_cols, img_channels  = mean_image.shape
+    model = resnet_AP.ResnetBuilder.build_resnet_18((img_rows, img_cols, img_channels),[3,3])
 
     # compile and plot the network 
     model.compile(loss = 'mse',
             optimizer = 'adam',
-            loss_weight = [1,1],
+            loss_weight = [0.01, 1],
             metrics = [MPE])
 
     plot_model(model, to_file = newpath+'model_store/model.png', 
@@ -124,10 +129,10 @@ def keras_debug(root_path, newpath):
     callback_list = [lr_reducer, early_stopper,  csv_logger, tensorboard, checkpoint]
     #######################################################################################
 
-    train_step = model.fit(X_train, Y_train,
+    train_step = model.fit(X_train, [P_train,A_train],
             batch_size =batch_size,
             epochs = epochs,
-            validation_data = (X_validation, Y_validation),
+            validation_data = (X_validation, [P_val, A_val]),
             shuffle = True,
             callbacks = callback_list)
 
