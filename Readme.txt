@@ -63,3 +63,6 @@ Folder:	dataset--all training and test data. (28/224, uniform/random, with angle
 	   	testmodel--many models for evaluation
 		log-- python -u *.py | tee ./log/*.log
 		photo_result--the heigth-MPE photos of all models.
+		conda_environment-- The environment of anaconda.("conda env create -f [file_name]")
+
+
